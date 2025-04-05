@@ -16,8 +16,7 @@ struct LandingView: View {
                 .resizable()
                 .frame(height: 350)
             Spacer()
-            HStack {
-                Spacer()
+            HStack(alignment: .center) {
                 ButtonView(text: "Signup",
                            icon: nil,
                            enabled: $enabled) {
@@ -28,7 +27,6 @@ struct LandingView: View {
                            enabled: $enabled) {
                     
                 }
-                Spacer()
             }
             .padding(.bottom, 8)
         }
