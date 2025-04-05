@@ -34,13 +34,6 @@ struct ContentView: View {
                     }
                 }
             }
-            .onAppear {
-                AGNetworkClient.shared.makeRequest(urlString: UrlConstants.countries,
-                                                   httpMethod: .get,
-                                                   type: CountriesData.self) { error, response in
-                    
-                }
-            }
         } detail: {
             Text("Select an item")
         }
