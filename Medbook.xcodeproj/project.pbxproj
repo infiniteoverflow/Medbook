@@ -27,6 +27,7 @@
 		6C57BEF32DA0D18E001720F7 /* Medbook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Medbook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C57BF052DA0D190001720F7 /* MedbookTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MedbookTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C57BF0F2DA0D190001720F7 /* MedbookUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MedbookUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6C57BF712DA1048B001720F7 /* Medbook.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Medbook.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +76,7 @@
 		6C57BEEA2DA0D18E001720F7 = {
 			isa = PBXGroup;
 			children = (
+				6C57BF712DA1048B001720F7 /* Medbook.xctestplan */,
 				6C57BEF52DA0D18E001720F7 /* Medbook */,
 				6C57BF082DA0D190001720F7 /* MedbookTests */,
 				6C57BF122DA0D190001720F7 /* MedbookUITests */,

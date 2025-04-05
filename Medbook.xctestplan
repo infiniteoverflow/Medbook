@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "A662D11A-7F22-43C7-9BF5-23EDFB8D61D7",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:Medbook.xcodeproj",
+      "identifier" : "6C57BEF22DA0D18E001720F7",
+      "name" : "Medbook"
+    }
+  },
+  "testTargets" : [
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Medbook.xcodeproj",
+        "identifier" : "6C57BF042DA0D190001720F7",
+        "name" : "MedbookTests"
+      }
+    },
+    {
+      "enabled" : false,
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:Medbook.xcodeproj",
+        "identifier" : "6C57BF0E2DA0D190001720F7",
+        "name" : "MedbookUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

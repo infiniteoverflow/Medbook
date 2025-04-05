@@ -15,6 +15,7 @@ struct LandingView: View {
             Image("landing")
                 .resizable()
                 .frame(height: 350)
+                .padding()
             Spacer()
             HStack(alignment: .center) {
                 ButtonView(text: "Signup",
@@ -36,8 +37,11 @@ struct LandingView: View {
 }
 
 #Preview {
+    @Previewable @StateObject var navigationManager = NavigationManager()
+    
     NavigationView {
         LandingView()
     }
+    .environmentObject(navigationManager)
 }
 

@@ -19,15 +19,13 @@ struct MedbookApp: App {
                     .navigationDestination(for: NavigationScreen.self) { screen in
                         switch screen {
                         case .signup:
-                            Text("Signup")
+                            SignupView(vm: SignupViewModel())
                         case .login:
                             Text("Login")
                         case .home:
                             Text("Home")
                         case .bookmarks:
                             Text("Bookmarks")
-                        default:
-                            Text("Default Screen")
                         }
                     }
             }
