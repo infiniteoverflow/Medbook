@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import Combine
 
 final class SignupViewModel: ObservableObject {
@@ -24,14 +25,20 @@ final class SignupViewModel: ObservableObject {
     @Published var selectedCountry: Country?
     @Published var countriesData: [String: Country]?
     @Published var countriesList: [Country]?
-    
+        
     private var passwordValidated = false
     private var isEmailValid = false
     private var countryCode: String?
     private var cancellables = Set<AnyCancellable>()
     private let dispatchGroup = DispatchGroup()
+    private var storedCountries = [CountryObject]()
     
-    init() {
+    let modelContext: ModelContext
+    
+    init(modelContext: ModelContext) {
+        print(ObjectIdentifier(modelContext))
+        self.modelContext = modelContext
+        
         fetchCountries()
         fetchCountryCode()
         
@@ -42,7 +49,24 @@ final class SignupViewModel: ObservableObject {
     }
     
     private func fetchCountries() {
-        dispatchGroup.enter()
+        do {
+            dispatchGroup.enter()
+            let fetchDescriptor = FetchDescriptor<CountryObject>()
+            storedCountries = try modelContext.fetch(fetchDescriptor)
+            
+            if storedCountries.isEmpty {
+                fetchCountriesFromServer()
+            } else {
+                isCountriesLoading = false
+                setCountriesList(from: storedCountries)
+                dispatchGroup.leave()
+            }
+        } catch {
+            print("Error fetching countries from local storage: \(error)")
+        }
+    }
+    
+    private func fetchCountriesFromServer() {
         AGNetworkClient.shared.makeRequest(urlString: UrlConstants.countries,
                                            httpMethod: .get,
                                            type: CountriesData.self) { [weak self] error, countriesData in
@@ -69,8 +93,18 @@ final class SignupViewModel: ObservableObject {
         }
     }
     
+    private func setCountriesList(from countries: [CountryObject]) {
+        countriesList = []
+        countriesData = [:]
+        countries.forEach { obj in
+            let country = Country(object: obj)
+            countriesData?[obj.countryCode] = country
+            countriesList?.append(country)
+        }
+    }
+    
     private func fetchCountryCode() {
-        if let countryCode = getValueFromUserDefaults(for: UDConstants.defaultCountryCode) {
+        if let countryCode = UserDefaultsHelper.shared.get(for: UDConstants.defaultCountryCode) {
             self.countryCode = countryCode as? String
         } else {
             fetchIPData()
@@ -93,7 +127,7 @@ final class SignupViewModel: ObservableObject {
                     return
                 }
                 
-                storeInUserDefaults(ip?.countryCode, key: UDConstants.defaultCountryCode)
+                UserDefaultsHelper.shared.store(ip?.countryCode, key: UDConstants.defaultCountryCode)
                 countryCode = ip?.countryCode
                 dispatchGroup.leave()
             }
@@ -110,10 +144,31 @@ final class SignupViewModel: ObservableObject {
                let countries = countriesData?.values {
                 selectedCountry = countriesData?[countryCode]
                 countriesList = Array(countries).sorted(by: { $0.country ?? "" < $1.country ?? "" })
+                
+                storeCountriesInLocalStorage()
             }
         }
     }
     
+    private func storeCountriesInLocalStorage() {
+        print(ObjectIdentifier(modelContext))
+        countriesData?.enumerated().forEach({ iterator in
+            let countryObject = CountryObject(countryCode: iterator.element.key,
+                                              item: iterator.element.value)
+            modelContext.insert(countryObject)
+        })
+        
+        saveData()
+    }
+    
+    private func saveData() {
+        do {
+            try modelContext.save()
+        } catch {
+            print("Error Saving Data")
+        }
+    }
+        
     private func listenToEmailText() {
         $emailText
             .sink { [weak self] value in
@@ -148,44 +203,14 @@ final class SignupViewModel: ObservableObject {
                     return
                 }
                 
-                atleastEightCharacters = doesTextHave8Characters(value)
-                atleastOneNumber = doesTextHaveNumbers(value)
-                uppercaseLetter = doesTextHaveUppercase(value)
-                specialCharacter = doesTextHaveSpecialCharacter(value)
+                atleastEightCharacters = AppUtils.doesTextHave8Characters(value)
+                atleastOneNumber = AppUtils.doesTextHaveNumbers(value)
+                uppercaseLetter = AppUtils.doesTextHaveUppercase(value)
+                specialCharacter = AppUtils.doesTextHaveSpecialCharacter(value)
                 
                 passwordValidated = atleastEightCharacters && atleastOneNumber && uppercaseLetter && specialCharacter
                 signupButtonEnabled = isEmailValid && passwordValidated
             }
             .store(in: &cancellables)
-    }
-    
-    private func doesTextHave8Characters(_ text: String) -> Bool {
-        text.count >= 8
-    }
-    
-    private func doesTextHaveUppercase(_ text: String) -> Bool {
-        let uppercaseRegex = "[A-Z]+"
-        let hasUppercase = text.range(of: uppercaseRegex, options: .regularExpression) != nil
-        return hasUppercase
-    }
-    
-    private func doesTextHaveNumbers(_ text: String) -> Bool {
-        let uppercaseRegex = "[0-9]+"
-        let hasUppercase = text.range(of: uppercaseRegex, options: .regularExpression) != nil
-        return hasUppercase
-    }
-    
-    private func doesTextHaveSpecialCharacter(_ text: String) -> Bool {
-        let specialCharacterRegex = "[^a-zA-Z0-9\\s]+" // Matches any character that is NOT a letter, number, or whitespace
-        let hasSpecialCharacter = text.range(of: specialCharacterRegex, options: .regularExpression) != nil
-        return hasSpecialCharacter
-    }
-    
-    private func storeInUserDefaults(_ value: Any?, key: String) {
-        UserDefaults.standard.set(value, forKey: key)
-    }
-    
-    private func getValueFromUserDefaults(for key: String) -> Any? {
-        UserDefaults.standard.value(forKey: key)
     }
 }

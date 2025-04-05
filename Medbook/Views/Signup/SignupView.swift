@@ -80,5 +80,6 @@ struct SignupView: View {
 }
 
 #Preview {
-    SignupView(vm: SignupViewModel())
+    @Previewable @Environment(\.modelContext) var modelContext
+    SignupView(vm: SignupViewModel(modelContext: modelContext))
 }

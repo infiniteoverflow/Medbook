@@ -12,6 +12,7 @@ extension UIWindow {
     //Perform some action when the device is shook!
     open override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         if motion == .motionShake {
+            //Show the netfox network debugger window
             NFX.sharedInstance().show()
         }
     }

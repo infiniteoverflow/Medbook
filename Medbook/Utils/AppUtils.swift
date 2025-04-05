@@ -18,4 +18,26 @@ struct AppUtils {
         let isValidEmail = email.range(of: emailRegex, options: .regularExpression) != nil
         return isValidEmail
     }
+    
+    static func doesTextHave8Characters(_ text: String) -> Bool {
+        text.count >= 8
+    }
+    
+    static func doesTextHaveUppercase(_ text: String) -> Bool {
+        let uppercaseRegex = "[A-Z]+"
+        let hasUppercase = text.range(of: uppercaseRegex, options: .regularExpression) != nil
+        return hasUppercase
+    }
+    
+    static func doesTextHaveNumbers(_ text: String) -> Bool {
+        let uppercaseRegex = "[0-9]+"
+        let hasUppercase = text.range(of: uppercaseRegex, options: .regularExpression) != nil
+        return hasUppercase
+    }
+    
+    static func doesTextHaveSpecialCharacter(_ text: String) -> Bool {
+        let specialCharacterRegex = "[^a-zA-Z0-9\\s]+" // Matches any character that is NOT a letter, number, or whitespace
+        let hasSpecialCharacter = text.range(of: specialCharacterRegex, options: .regularExpression) != nil
+        return hasSpecialCharacter
+    }
 }
