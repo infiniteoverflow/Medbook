@@ -21,7 +21,7 @@ struct MedbookApp: App {
                         case .signup:
                             SignupView(vm: SignupViewModel())
                         case .login:
-                            Text("Login")
+                            LoginView(vm: LoginViewModel(navigationManager: navigationManager))
                         case .home:
                             Text("Home")
                         case .bookmarks:

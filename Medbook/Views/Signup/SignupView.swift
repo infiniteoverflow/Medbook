@@ -14,31 +14,26 @@ struct SignupView: View {
     struct Constants {
         static let title = "Welcome"
         static let subtitle = "sign up to continue"
-        static let emailHintText = "Email"
-        static let passwordHintText = "Password"
     }
     
     var body: some View {
         VStack {
             ScrollView {
                 VStack(alignment: .leading) {
-                    VStack(alignment: .leading) {
-                        Text(Constants.title)
-                            .font(.system(size: 24, weight: .bold))
-                        Text(Constants.subtitle)
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(ColorConstants.primary)
-                    }
-                    .foregroundStyle(ColorConstants.black)
-
+                    
+                    TitleAndSubtitleView(title: Constants.title, subtitle: Constants.subtitle)
                     
                     VStack(spacing: 48) {
-                        TextfieldWithDivider(hintText: Constants.emailHintText,
+                        TextfieldWithDivider(hintText: TextConstants.emailHintText,
+                                             dividerColor: ColorConstants.black,
+                                             isPassword: false,
                                              text: $vm.emailText,
-                                             dividerColor: ColorConstants.black)
-                        TextfieldWithDivider(hintText: Constants.passwordHintText,
+                                             errorText: $vm.invalidEmailText)
+                        TextfieldWithDivider(hintText: TextConstants.passwordHintText,
+                                             dividerColor: ColorConstants.black,
+                                             isPassword: true,
                                              text: $vm.passwordText,
-                                             dividerColor: ColorConstants.black)
+                                             errorText: .constant(nil))
                     }
                     .foregroundStyle(ColorConstants.black)
                     .padding(.top, 56)
@@ -50,20 +45,34 @@ struct SignupView: View {
                         CheckboxWithText(selected: $vm.specialCharacter, text: "Contains a special character")
                     }
                     .padding(.top, 32)
-                    
-                    HStack {
-                        Spacer()
-                    }
                 }
-                .padding(24)
+                .padding(AuthenticationUI.screenPadding)
+                
+                if vm.isCountriesLoading {
+                    ProgressView()
+                        .tint(ColorConstants.primary)
+                } else if let countries = vm.countriesList,
+                          vm.selectedCountry != nil,
+                          !countries.isEmpty {
+                    Picker("Countries List", selection: $vm.selectedCountry) {
+                        ForEach(countries, id: \.self) { country in
+                            Text(country.country ?? "")
+                                .foregroundStyle(ColorConstants.black)
+                                .tag(country)
+                        }
+                    }
+                    .pickerStyle(.wheel)
+                    .frame(height: 140)
+                }
             }
+            .scrollBounceBehavior(.basedOnSize)
             
             Spacer()
             
             ButtonView(text: "Let's go",
                        icon: "arrow.forward",
-                       enabled: $vm.fieldsValidated) {
-                navigationManager.navigateTo(screen: .home)
+                       enabled: $vm.signupButtonEnabled) {
+                navigationManager.navigateToClearingAll(screen: .home)
             }
         }
         .background(ColorConstants.white)

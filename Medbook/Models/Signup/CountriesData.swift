@@ -5,6 +5,8 @@
 //  Created by Aswin Gopinathan on 05/04/25.
 //
 
+import Foundation
+
 /// Represents the response received from the countries API
 struct CountriesData: Codable {
     /// The status of the API request (e.g., "OK", "Error")
@@ -39,7 +41,8 @@ struct CountriesData: Codable {
 }
 
 /// Represents information about an individual country
-struct Country: Codable {
+struct Country: Codable, Hashable, Equatable, Identifiable {
+    let id = UUID()
     /// The name of the country
     let country: String?
     /// The region to which the country belongs

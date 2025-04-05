@@ -11,22 +11,107 @@ import Combine
 final class SignupViewModel: ObservableObject {
     @Published var emailText: String = ""
     @Published var passwordText: String = ""
+    @Published var invalidEmailText: String?
     
     @Published var atleastEightCharacters: Bool = false
     @Published var atleastOneNumber: Bool = false
     @Published var uppercaseLetter: Bool = false
     @Published var specialCharacter: Bool = false
     
-    @Published var passwordValidated = false
-    @Published var emailValidated = false
+    @Published var signupButtonEnabled = false
     
-    @Published var fieldsValidated = false
+    @Published var isCountriesLoading = true
+    @Published var selectedCountry: Country?
+    @Published var countriesData: [String: Country]?
+    @Published var countriesList: [Country]?
     
+    private var passwordValidated = false
+    private var isEmailValid = false
+    private var countryCode: String?
     private var cancellables = Set<AnyCancellable>()
+    private let dispatchGroup = DispatchGroup()
     
     init() {
+        fetchCountries()
+        fetchCountryCode()
+        
         listenToEmailText()
         listenToPasswordText()
+        
+        handleApiResponses()
+    }
+    
+    private func fetchCountries() {
+        dispatchGroup.enter()
+        AGNetworkClient.shared.makeRequest(urlString: UrlConstants.countries,
+                                           httpMethod: .get,
+                                           type: CountriesData.self) { [weak self] error, countriesData in
+            guard let self else {
+                return
+            }
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self else {
+                    return
+                }
+                
+                isCountriesLoading = false
+                
+                if let error {
+                    //TODO: Handle error scenario
+                    print(error.localizedDescription)
+                    return
+                }
+                
+                self.countriesData = countriesData?.data
+                dispatchGroup.leave()
+            }
+        }
+    }
+    
+    private func fetchCountryCode() {
+        if let countryCode = getValueFromUserDefaults(for: UDConstants.defaultCountryCode) {
+            self.countryCode = countryCode as? String
+        } else {
+            fetchIPData()
+        }
+    }
+    
+    private func fetchIPData() {
+        dispatchGroup.enter()
+        AGNetworkClient.shared.makeRequest(urlString: UrlConstants.ip,
+                                           httpMethod: .get,
+                                           type: IPData.self) { error, ip in
+            DispatchQueue.main.async { [weak self] in
+                guard let self else {
+                    return
+                }
+                
+                if let error {
+                    //TODO: Handle error scenarios
+                    print(error.localizedDescription)
+                    return
+                }
+                
+                storeInUserDefaults(ip?.countryCode, key: UDConstants.defaultCountryCode)
+                countryCode = ip?.countryCode
+                dispatchGroup.leave()
+            }
+        }
+    }
+    
+    private func handleApiResponses() {
+        dispatchGroup.notify(queue: .main) { [weak self] in
+            guard let self else {
+                return
+            }
+            
+            if let countryCode,
+               let countries = countriesData?.values {
+                selectedCountry = countriesData?[countryCode]
+                countriesList = Array(countries).sorted(by: { $0.country ?? "" < $1.country ?? "" })
+            }
+        }
     }
     
     private func listenToEmailText() {
@@ -35,8 +120,23 @@ final class SignupViewModel: ObservableObject {
                 guard let self else {
                     return
                 }
-                emailValidated = isValidEmail(value)
-                fieldsValidated = emailValidated && passwordValidated
+                
+                if value.isEmpty {
+                    invalidEmailText = nil
+                    signupButtonEnabled = false
+                    return
+                }
+                
+                isEmailValid = AppUtils.isValidEmail(value)
+                
+                if !isEmailValid {
+                    invalidEmailText = TextConstants.invalidEmailErrorText
+                    signupButtonEnabled = false
+                    return
+                }
+                
+                invalidEmailText = nil
+                signupButtonEnabled = isEmailValid && passwordValidated
             }
             .store(in: &cancellables)
     }
@@ -54,22 +154,9 @@ final class SignupViewModel: ObservableObject {
                 specialCharacter = doesTextHaveSpecialCharacter(value)
                 
                 passwordValidated = atleastEightCharacters && atleastOneNumber && uppercaseLetter && specialCharacter
-                fieldsValidated = emailValidated && passwordValidated
+                signupButtonEnabled = isEmailValid && passwordValidated
             }
             .store(in: &cancellables)
-    }
-    
-    func isValidEmail(_ email: String) -> Bool {
-        guard !email.isEmpty else {
-            return false // Empty string is not a valid email
-        }
-
-        // A basic regular expression for email validation.
-        // This is not a 100% foolproof solution but covers most common cases.
-        let emailRegex = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-
-        let isValidEmail = email.range(of: emailRegex, options: .regularExpression) != nil
-        return isValidEmail
     }
     
     private func doesTextHave8Characters(_ text: String) -> Bool {
@@ -92,5 +179,13 @@ final class SignupViewModel: ObservableObject {
         let specialCharacterRegex = "[^a-zA-Z0-9\\s]+" // Matches any character that is NOT a letter, number, or whitespace
         let hasSpecialCharacter = text.range(of: specialCharacterRegex, options: .regularExpression) != nil
         return hasSpecialCharacter
+    }
+    
+    private func storeInUserDefaults(_ value: Any?, key: String) {
+        UserDefaults.standard.set(value, forKey: key)
+    }
+    
+    private func getValueFromUserDefaults(for key: String) -> Any? {
+        UserDefaults.standard.value(forKey: key)
     }
 }

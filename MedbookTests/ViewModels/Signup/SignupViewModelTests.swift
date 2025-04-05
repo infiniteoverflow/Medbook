@@ -178,7 +178,7 @@ final class SignupViewModelTests: XCTestCase {
         viewModel.passwordText = "P@sswOrd1"
         XCTAssertTrue(viewModel.emailValidated)
         XCTAssertTrue(viewModel.passwordValidated)
-        XCTAssertTrue(viewModel.fieldsValidated)
+        XCTAssertTrue(viewModel.signupButtonEnabled)
     }
 
     func testFieldsNotValidatedWhenEmailIsInvalid() {
@@ -189,7 +189,7 @@ final class SignupViewModelTests: XCTestCase {
         viewModel.passwordText = "P@sswOrd1"
         XCTAssertFalse(viewModel.emailValidated)
         XCTAssertTrue(viewModel.passwordValidated)
-        XCTAssertFalse(viewModel.fieldsValidated)
+        XCTAssertFalse(viewModel.signupButtonEnabled)
     }
 
     func testFieldsNotValidatedWhenPasswordIsInvalid() {
@@ -200,7 +200,7 @@ final class SignupViewModelTests: XCTestCase {
         viewModel.passwordText = "pass1"
         XCTAssertTrue(viewModel.emailValidated)
         XCTAssertFalse(viewModel.passwordValidated)
-        XCTAssertFalse(viewModel.fieldsValidated)
+        XCTAssertFalse(viewModel.signupButtonEnabled)
     }
 
     func testFieldsNotValidatedWhenBothAreInvalid() {
@@ -211,7 +211,7 @@ final class SignupViewModelTests: XCTestCase {
         viewModel.passwordText = "pass"
         XCTAssertFalse(viewModel.emailValidated)
         XCTAssertFalse(viewModel.passwordValidated)
-        XCTAssertFalse(viewModel.fieldsValidated)
+        XCTAssertFalse(viewModel.signupButtonEnabled)
     }
 
     // MARK: - Combine Subscription Tests (Optional, but good practice)
@@ -265,7 +265,7 @@ final class SignupViewModelTests: XCTestCase {
         let expectation = XCTestExpectation(description: "fieldsValidated updated")
         var validationCount = 0
 
-        viewModel.$fieldsValidated
+        viewModel.$signupButtonEnabled
             .dropFirst()
             .sink { _ in
                 validationCount += 1
@@ -277,6 +277,6 @@ final class SignupViewModelTests: XCTestCase {
         viewModel.passwordText = "P@sswOrd1"
         wait(for: [expectation], timeout: 0.1)
         XCTAssertEqual(validationCount, 2, "fieldsValidated should update after both email and password are set")
-        XCTAssertTrue(viewModel.fieldsValidated)
+        XCTAssertTrue(viewModel.signupButtonEnabled)
     }
 }

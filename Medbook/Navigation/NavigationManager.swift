@@ -9,7 +9,7 @@ import SwiftUI
 
 final class NavigationManager: ObservableObject, NavigationManagerProtocol {
     @Published var navigationPath =  NavigationPath()
-
+    
     func navigateTo(screen: NavigationScreen) {
         navigationPath.append(screen)
     }

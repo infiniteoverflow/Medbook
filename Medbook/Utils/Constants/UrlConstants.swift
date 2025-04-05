@@ -7,4 +7,5 @@
 
 struct UrlConstants {
     static let countries = "https://api.first.org/data/v1/countries"
+    static let ip = "http://ip-api.com/json"
 }

@@ -9,21 +9,42 @@ import SwiftUI
 
 struct TextfieldWithDivider: View {
     let hintText: String
-    @Binding var text: String
     let dividerColor: Color
+    let isPassword: Bool
+    @Binding var text: String
+    @Binding var errorText: String?
     
     var body: some View {
-        VStack(spacing: 4) {
-            TextField("",
-                      text: $text,
-                      prompt: Text(hintText).foregroundStyle(ColorConstants.primary))
+        VStack(alignment: .leading,
+               spacing: 4) {
+            if isPassword {
+                SecureField("",
+                            text: $text,
+                            prompt: Text(hintText).foregroundStyle(ColorConstants.primary))
+            } else {
+                TextField("",
+                          text: $text,
+                          prompt: Text(hintText).foregroundStyle(ColorConstants.primary))
+            }
             Divider()
                 .background(dividerColor)
+            
+            if let errorText,
+               !errorText.isEmpty {
+                Text(errorText)
+                    .foregroundStyle(.red)
+                    .font(.caption)
+            }
         }
     }
 }
 
 #Preview {
     @Previewable @State var text: String = ""
-    TextfieldWithDivider(hintText: "Email", text: $text, dividerColor: ColorConstants.black)
+    @Previewable @State var errorText: String? = "Something went wrong"
+    TextfieldWithDivider(hintText: "Email",
+                         dividerColor: ColorConstants.black,
+                         isPassword: true,
+                         text: $text,
+                         errorText: $errorText)
 }

@@ -12,10 +12,16 @@ struct LandingView: View {
     
     var body: some View {
         VStack {
-            Image("landing")
-                .resizable()
-                .frame(height: 350)
-                .padding()
+            ScrollView {
+                VStack {
+                    Image("landing")
+                        .resizable()
+                        .frame(height: 350)
+                        .padding()
+                }
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            
             Spacer()
             HStack(alignment: .center) {
                 ButtonView(text: "Signup",
