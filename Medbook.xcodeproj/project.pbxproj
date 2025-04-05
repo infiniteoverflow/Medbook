@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		6C57BFCA2DA193F1001720F7 /* netfox in Frameworks */ = {isa = PBXBuildFile; productRef = 6C57BFC92DA193F1001720F7 /* netfox */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		6C57BF062DA0D190001720F7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -66,6 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6C57BFCA2DA193F1001720F7 /* netfox in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +132,7 @@
 			);
 			name = Medbook;
 			packageProductDependencies = (
+				6C57BFC92DA193F1001720F7 /* netfox */,
 			);
 			productName = Medbook;
 			productReference = 6C57BEF32DA0D18E001720F7 /* Medbook.app */;
@@ -210,6 +216,9 @@
 			);
 			mainGroup = 6C57BEEA2DA0D18E001720F7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				6C57BFC82DA1939F001720F7 /* XCRemoteSwiftPackageReference "netfox" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 6C57BEF42DA0D18E001720F7 /* Products */;
 			projectDirPath = "";
@@ -575,6 +584,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6C57BFC82DA1939F001720F7 /* XCRemoteSwiftPackageReference "netfox" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kasketis/netfox";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.21.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6C57BFC92DA193F1001720F7 /* netfox */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6C57BFC82DA1939F001720F7 /* XCRemoteSwiftPackageReference "netfox" */;
+			productName = netfox;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6C57BEEB2DA0D18E001720F7 /* Project object */;
 }

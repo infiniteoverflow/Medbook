@@ -7,10 +7,15 @@
 
 import SwiftUI
 import SwiftData
+import netfox
 
 @main
 struct MedbookApp: App {
     @StateObject private var navigationManager = NavigationManager()
+    
+    init() {
+        NFX.sharedInstance().start()
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -28,6 +33,9 @@ struct MedbookApp: App {
                             Text("Bookmarks")
                         }
                     }
+            }
+            .onDisappear {
+                NFX.sharedInstance().stop()
             }
         }
         .environmentObject(navigationManager)
