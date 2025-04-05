@@ -36,7 +36,6 @@ final class SignupViewModel: ObservableObject {
     let modelContext: ModelContext
     
     init(modelContext: ModelContext) {
-        print(ObjectIdentifier(modelContext))
         self.modelContext = modelContext
         
         fetchCountries()
@@ -151,7 +150,6 @@ final class SignupViewModel: ObservableObject {
     }
     
     private func storeCountriesInLocalStorage() {
-        print(ObjectIdentifier(modelContext))
         countriesData?.enumerated().forEach({ iterator in
             let countryObject = CountryObject(countryCode: iterator.element.key,
                                               item: iterator.element.value)
