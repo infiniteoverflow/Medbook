@@ -9,4 +9,5 @@ struct TextConstants {
     static let emailHintText = "Email"
     static let passwordHintText = "Password"
     static let invalidEmailErrorText = "Please enter a valid email"
+    static let credentialKey = "credential"
 }

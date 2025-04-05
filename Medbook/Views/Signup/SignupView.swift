@@ -72,7 +72,15 @@ struct SignupView: View {
             ButtonView(text: "Let's go",
                        icon: "arrow.forward",
                        enabled: $vm.signupButtonEnabled) {
-                navigationManager.navigateToClearingAll(screen: .home)
+                vm.onSubmitTapped { result in
+                    switch result {
+                    case .success:
+                        navigationManager.navigateTo(screen: .home)
+                    case .failure:
+                        //TODO: Handle failure to save data in DB
+                        print("Saving data failed")
+                    }
+                }
             }
         }
         .background(ColorConstants.white)

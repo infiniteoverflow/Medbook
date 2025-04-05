@@ -30,7 +30,8 @@ struct MedbookApp: App {
                             case .signup:
                                 SignupView(vm: SignupViewModel(modelContext: container.mainContext))
                             case .login:
-                                LoginView(vm: LoginViewModel(navigationManager: navigationManager))
+                                LoginView(vm: LoginViewModel(navigationManager: navigationManager,
+                                                             modelContext: container.mainContext))
                             case .home:
                                 Text("Home")
                             case .bookmarks:
@@ -48,7 +49,8 @@ struct MedbookApp: App {
             }
         }
         .environmentObject(navigationManager)
-        .modelContainer(for: [CountryObject.self])  { result in
+        .modelContainer(for: [CountryObject.self,
+                              UserObject.self])  { result in
             switch result {
             case .success(let container):
                 self.container = container

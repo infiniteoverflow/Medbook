@@ -25,7 +25,7 @@ final class SignupViewModel: ObservableObject {
     @Published var selectedCountry: Country?
     @Published var countriesData: [String: Country]?
     @Published var countriesList: [Country]?
-        
+    
     private var passwordValidated = false
     private var isEmailValid = false
     private var countryCode: String?
@@ -33,10 +33,15 @@ final class SignupViewModel: ObservableObject {
     private let dispatchGroup = DispatchGroup()
     private var storedCountries = [CountryObject]()
     
+    let base64Helper = Base64Helper()
+    let userDefaultsHelper = UserDefaultsHelper()
+    let swiftDataHelper: SwiftDataHelper
+    
     let modelContext: ModelContext
     
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
+        self.swiftDataHelper = SwiftDataHelper(modelContext: modelContext)
         
         fetchCountries()
         fetchCountryCode()
@@ -47,21 +52,27 @@ final class SignupViewModel: ObservableObject {
         handleApiResponses()
     }
     
+    func onSubmitTapped(completion: (DataSaveResult) -> Void) {
+        let userData = [
+            TextConstants.credentialKey: emailText+passwordText
+        ]
+        
+        if let base64EncodedData = base64Helper.encode(userData) {
+            let userObject = UserObject(encodedCredential: base64EncodedData)
+            swiftDataHelper.storeData(userObject)
+            swiftDataHelper.saveData(completion: completion)
+        }
+    }
+    
     private func fetchCountries() {
-        do {
-            dispatchGroup.enter()
-            let fetchDescriptor = FetchDescriptor<CountryObject>()
-            storedCountries = try modelContext.fetch(fetchDescriptor)
-            
-            if storedCountries.isEmpty {
-                fetchCountriesFromServer()
-            } else {
-                isCountriesLoading = false
-                setCountriesList(from: storedCountries)
-                dispatchGroup.leave()
-            }
-        } catch {
-            print("Error fetching countries from local storage: \(error)")
+        dispatchGroup.enter()
+        let storedCountries: [CountryObject]? = swiftDataHelper.fetchData()
+        if storedCountries == nil || (storedCountries ?? []).isEmpty {
+            fetchCountriesFromServer()
+        } else if let storedCountries {
+            isCountriesLoading = false
+            setCountriesList(from: storedCountries)
+            dispatchGroup.leave()
         }
     }
     
@@ -103,7 +114,7 @@ final class SignupViewModel: ObservableObject {
     }
     
     private func fetchCountryCode() {
-        if let countryCode = UserDefaultsHelper.shared.get(for: UDConstants.defaultCountryCode) {
+        if let countryCode = userDefaultsHelper.get(for: UDConstants.defaultCountryCode) {
             self.countryCode = countryCode as? String
         } else {
             fetchIPData()
@@ -126,7 +137,7 @@ final class SignupViewModel: ObservableObject {
                     return
                 }
                 
-                UserDefaultsHelper.shared.store(ip?.countryCode, key: UDConstants.defaultCountryCode)
+                userDefaultsHelper.store(ip?.countryCode, key: UDConstants.defaultCountryCode)
                 countryCode = ip?.countryCode
                 dispatchGroup.leave()
             }
@@ -156,14 +167,8 @@ final class SignupViewModel: ObservableObject {
             modelContext.insert(countryObject)
         })
         
-        saveData()
-    }
-    
-    private func saveData() {
-        do {
-            try modelContext.save()
-        } catch {
-            print("Error Saving Data")
+        swiftDataHelper.saveData { result in
+            return
         }
     }
         

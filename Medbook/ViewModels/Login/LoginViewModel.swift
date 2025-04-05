@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import Combine
 
 final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
@@ -18,9 +19,16 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
     @Published var loginEnabled = false
     
     private var isEmailValid = false
+    
+    let modelContext: ModelContext
+    let swiftDataHelper: SwiftDataHelper
+    let base64Helper = Base64Helper()
 
-    init(navigationManager: NavigationManager) {
+    init(navigationManager: NavigationManager,
+         modelContext: ModelContext) {
         self.navigationManager = navigationManager
+        self.modelContext = modelContext
+        self.swiftDataHelper = SwiftDataHelper(modelContext: modelContext)
         
         listenToEmailChange()
         listenToPasswordChange()
@@ -76,7 +84,7 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
                             password: passwordText) { state in
             switch state {
             case .success:
-                print("Success")
+                navigationManager.navigateTo(screen: .home)
             case .failure(let reason):
                 print("Failure: \(reason)")
             }
@@ -86,6 +94,19 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
     func validateCredentials(email: String,
                              password: String,
                              completion: (AuthenticationState) -> Void) {
-        //TODO: Add logic for validating email and password with DB
+        let userObjects: [UserObject] = swiftDataHelper.fetchData() ?? []
+        let userData = [
+            TextConstants.credentialKey: emailText+passwordText
+        ]
+        
+        if let base64EncodedData = base64Helper.encode(userData) {
+            let user = userObjects.first { obj in
+                obj.encodedCredential == base64EncodedData
+            }
+            
+            return user == nil ? completion(.failure(reason: "No User")) : completion(.success)
+        }
+        
+        return completion(.failure(reason: "No User"))
     }
 }

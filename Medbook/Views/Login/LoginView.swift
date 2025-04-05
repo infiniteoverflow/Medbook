@@ -59,5 +59,7 @@ struct LoginView: View {
 
 #Preview {
     @Previewable @StateObject var navigationManager = NavigationManager()
-    LoginView(vm: LoginViewModel(navigationManager: navigationManager))
+    @Previewable @Environment(\.modelContext) var modelContext
+    LoginView(vm: LoginViewModel(navigationManager: navigationManager,
+                                 modelContext: modelContext))
 }

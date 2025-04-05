@@ -7,13 +7,7 @@
 
 import Foundation
 
-struct UserDefaultsHelper {
-    private init() {
-        //Empty Init
-    }
-    
-    static let shared = UserDefaultsHelper()
-    
+struct UserDefaultsHelper {    
     func store(_ value: Any?, key: String) {
         UserDefaults.standard.set(value, forKey: key)
     }
