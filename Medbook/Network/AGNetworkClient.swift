@@ -32,7 +32,7 @@ struct AGNetworkClient: AGNetworkClientProtocol {
         let dataTask = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             ///If error occured while making the api call
             //TODO: Handle error codes
-            guard error != nil else {
+            guard error == nil else {
                 completion(.somethingWentWrong, nil)
                 return
             }
