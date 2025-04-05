@@ -10,23 +10,28 @@ import SwiftData
 
 @main
 struct MedbookApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    @StateObject private var navigationManager = NavigationManager()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack(path: $navigationManager.navigationPath) {
+                LandingView()
+                    .navigationDestination(for: NavigationScreen.self) { screen in
+                        switch screen {
+                        case .signup:
+                            Text("Signup")
+                        case .login:
+                            Text("Login")
+                        case .home:
+                            Text("Home")
+                        case .bookmarks:
+                            Text("Bookmarks")
+                        default:
+                            Text("Default Screen")
+                        }
+                    }
+            }
         }
-        .modelContainer(sharedModelContainer)
+        .environmentObject(navigationManager)
     }
 }

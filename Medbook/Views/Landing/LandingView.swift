@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LandingView: View {
-    @State var enabled = true
+    @EnvironmentObject private var navigationManager: NavigationManager
     
     var body: some View {
         VStack {
@@ -19,13 +19,13 @@ struct LandingView: View {
             HStack(alignment: .center) {
                 ButtonView(text: "Signup",
                            icon: nil,
-                           enabled: $enabled) {
-                    
+                           enabled: .constant(true)) {
+                    navigationManager.navigateTo(screen: .signup)
                 }
                 ButtonView(text: "Login",
                            icon: nil,
-                           enabled: $enabled) {
-                    
+                           enabled: .constant(true)) {
+                    navigationManager.navigateTo(screen: .login)
                 }
             }
             .padding(.bottom, 8)
