@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+///Common view to be used when a progress view needs to be shown to the user.
 struct AppProgressView: View {
     var body: some View {
         HStack {
