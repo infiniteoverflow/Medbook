@@ -17,17 +17,14 @@ enum AppUserState {
 final class AppViewModel: ObservableObject, AppViewModelProtocol {
     var appPreferenceObject: AppPreferenceObject?
     @Published var userState: AppUserState = .loading
-    var modelContext: ModelContext?
+    let modelContext: ModelContext
 
-    func setModelContext(modelContext: ModelContext) {
+    init(modelContext: ModelContext) {
         self.modelContext = modelContext
+        isUserLoggedIn()
     }
     
     func isUserLoggedIn() {
-        guard let modelContext else {
-            userState = .newUser
-            return
-        }
         let swiftDataHelper = SwiftDataHelper(modelContext: modelContext)
         let appPreferenceData: [AppPreferenceObject]? = swiftDataHelper.fetchData()
         appPreferenceObject = appPreferenceData?.first

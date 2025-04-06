@@ -11,9 +11,14 @@ import netfox
 
 @main
 struct MedbookApp: App {
+    //Manager that takes care of the navigation within the app
     @StateObject private var navigationManager = NavigationManager()
+    
+    //Stores the instance of the ModelContainer that we will be using to work with SwiftData objects
     @State var container: ModelContainer?
-    @ObservedObject var vm: AppViewModel = AppViewModel()
+    
+    //ViewModel for the current view which ideally takes care of the initial navigation
+    @State var vm: AppViewModel?
     
     init() {
         //Start the netfox instance to log network calls for debugging
@@ -27,35 +32,24 @@ struct MedbookApp: App {
             if let container {
                 NavigationStack(path: $navigationManager.navigationPath) {
                     VStack {
-                        switch vm.userState {
-                        case .loading:
+                        switch vm?.userState {
+                        case .loading: //ModelContainer is getting setup for the flow without which we cannot proceed further
                             AppProgressView()
-                        case .loggedIn:
+                        case .loggedIn: //User is already logged-in to the app and should see the HomePage
                             HomePageView(vm: HomePageViewModel(navigationManager: navigationManager,
                                                                modelContext: container.mainContext))
-                        case .newUser:
+                        case .newUser: //User is a new user and should see the Landing page
                             LandingView()
+                        default: //Safety measure in-case ModelContainer is not created and VM is not available
+                            AppProgressView()
                         }
                     }
                     .navigationDestination(for: NavigationScreen.self) { screen in
-                        switch screen {
-                        case .signup:
-                            SignupView(vm: SignupViewModel(modelContext: container.mainContext))
-                        case .login:
-                            LoginView(vm: LoginViewModel(navigationManager: navigationManager,
-                                                         modelContext: container.mainContext))
-                        case .home:
-                            HomePageView(vm: HomePageViewModel(navigationManager: navigationManager,
-                                                               modelContext: container.mainContext))
-                        case .bookmarks:
-                            BookmarksView()
-                        case .landing:
-                            LandingView()
-                        }
+                        AnyView(getNavigationScreen(for: screen,
+                                                    container: container))
                     }
                 }
-                
-                .preferredColorScheme(.light)
+                .preferredColorScheme(.light) //Currently supporting only Light mode!
                 .modelContext(container.mainContext)
                 .onDisappear {
                     //Stop the netfox instance from loggin network calls for debugging
@@ -67,19 +61,43 @@ struct MedbookApp: App {
                 AppProgressView()
             }
         }
-        .environmentObject(navigationManager)
-        .modelContainer(for: [CountryObject.self,
-                              UserObject.self,
-                              BookObject.self,
-                              AppPreferenceObject.self])  { result in
-            switch result {
-            case .success(let container):
-                self.container = container
-                vm.setModelContext(modelContext: container.mainContext)
-                vm.isUserLoggedIn()
-            case .failure(let error):
-                print("MedbookApp - Error creating container: \(error)")
-            }
+        .environmentObject(navigationManager) //We need a common instance of NavigationManager throughout the App Session
+        .modelContainer(for: [CountryObject.self, //Represents the Country object
+                              UserObject.self, //Represents the details of the user after authentication
+                              BookObject.self, //Represents each book item
+                              AppPreferenceObject.self //Represents common preference items to run the app
+                             ])  { result in
+            handleContainerResult(result: result)
+        }
+    }
+    
+    //Handle the result of setting up a ModelContainer
+    private func handleContainerResult(result: Result<ModelContainer, any Error>) {
+        switch result {
+        case .success(let container):
+            self.container = container
+            vm = AppViewModel(modelContext: container.mainContext)
+        case .failure(let error):
+            print("MedbookApp - Error creating container: \(error)")
+        }
+    }
+    
+    //Return the ScreenView based on the screen enum
+    private func getNavigationScreen(for screen: NavigationScreen,
+                                     container: ModelContainer) -> any View {
+        switch screen {
+        case .signup:
+            SignupView(vm: SignupViewModel(modelContext: container.mainContext))
+        case .login:
+            LoginView(vm: LoginViewModel(navigationManager: navigationManager,
+                                         modelContext: container.mainContext))
+        case .home:
+            HomePageView(vm: HomePageViewModel(navigationManager: navigationManager,
+                                               modelContext: container.mainContext))
+        case .bookmarks:
+            BookmarksView()
+        case .landing:
+            LandingView()
         }
     }
 }
