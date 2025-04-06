@@ -40,4 +40,15 @@ struct AppUtils {
         let hasSpecialCharacter = text.range(of: specialCharacterRegex, options: .regularExpression) != nil
         return hasSpecialCharacter
     }
+    
+    static func generateBase64String(email: String?, password: String?) -> String? {
+        guard let email, let password else {
+            return nil
+        }
+        let userData = [
+            TextConstants.credentialKey: email + password
+        ]
+        
+        return Base64Helper().encode(userData)
+    }
 }

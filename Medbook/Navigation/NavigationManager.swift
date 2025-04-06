@@ -19,7 +19,10 @@ final class NavigationManager: ObservableObject, NavigationManagerProtocol {
     }
     
     func navigateToClearingAll(screen: NavigationScreen) {
-        navigationPath = NavigationPath()
-        navigationPath.append(screen)
+        if navigationPath.isEmpty {
+            navigationPath.append(screen)
+        } else {
+            navigationPath = NavigationPath()
+        }
     }
 }

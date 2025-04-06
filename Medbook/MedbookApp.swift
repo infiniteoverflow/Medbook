@@ -24,7 +24,8 @@ struct MedbookApp: App {
         WindowGroup {
             if let container {
                 NavigationStack(path: $navigationManager.navigationPath) {
-                    LandingView()
+                    HomePageView(vm: HomePageViewModel(navigationManager: navigationManager,
+                                                       modelContext: container.mainContext))
                         .navigationDestination(for: NavigationScreen.self) { screen in
                             switch screen {
                             case .signup:
@@ -33,9 +34,12 @@ struct MedbookApp: App {
                                 LoginView(vm: LoginViewModel(navigationManager: navigationManager,
                                                              modelContext: container.mainContext))
                             case .home:
-                                Text("Home")
+                                HomePageView(vm: HomePageViewModel(navigationManager: navigationManager,
+                                                                   modelContext: container.mainContext))
                             case .bookmarks:
-                                Text("Bookmarks")
+                                BookmarksView()
+                            case .landing:
+                                LandingView()
                             }
                         }
                 }
@@ -45,12 +49,13 @@ struct MedbookApp: App {
                     NFX.sharedInstance().stop()
                 }
             } else {
-                ProgressView()
+                AppProgressView()
             }
         }
         .environmentObject(navigationManager)
         .modelContainer(for: [CountryObject.self,
-                              UserObject.self])  { result in
+                              UserObject.self,
+                              BookObject.self])  { result in
             switch result {
             case .success(let container):
                 self.container = container

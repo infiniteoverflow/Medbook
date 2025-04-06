@@ -95,11 +95,7 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
                              password: String,
                              completion: (AuthenticationState) -> Void) {
         let userObjects: [UserObject] = swiftDataHelper.fetchData() ?? []
-        let userData = [
-            TextConstants.credentialKey: emailText+passwordText
-        ]
-        
-        if let base64EncodedData = base64Helper.encode(userData) {
+        if let base64EncodedData = AppUtils.generateBase64String(email: emailText, password: passwordText) {
             let user = userObjects.first { obj in
                 obj.encodedCredential == base64EncodedData
             }

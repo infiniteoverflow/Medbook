@@ -38,6 +38,7 @@ struct LandingView: View {
             .padding(.bottom, 8)
         }
         .navigationTitle("MedBook")
+        .navigationBarBackButtonHidden()
         .background(ColorConstants.primary)
     }
 }

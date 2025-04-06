@@ -24,6 +24,10 @@ struct SwiftDataHelper {
         modelContext.insert(data)
     }
     
+    func removeData(_ data: any PersistentModel) {
+        modelContext.delete(data)
+    }
+    
     func fetchData<T: PersistentModel>() -> [T]? {
         do {
             let fetchDescriptor = FetchDescriptor<T>()

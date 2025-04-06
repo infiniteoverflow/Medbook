@@ -53,11 +53,7 @@ final class SignupViewModel: ObservableObject {
     }
     
     func onSubmitTapped(completion: (DataSaveResult) -> Void) {
-        let userData = [
-            TextConstants.credentialKey: emailText+passwordText
-        ]
-        
-        if let base64EncodedData = base64Helper.encode(userData) {
+        if let base64EncodedData = AppUtils.generateBase64String(email: emailText, password: passwordText) {
             let userObject = UserObject(encodedCredential: base64EncodedData)
             swiftDataHelper.storeData(userObject)
             swiftDataHelper.saveData(completion: completion)

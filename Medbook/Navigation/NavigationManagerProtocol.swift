@@ -10,6 +10,7 @@ enum NavigationScreen {
     case login
     case home
     case bookmarks
+    case landing
 }
 
 protocol NavigationManagerProtocol {

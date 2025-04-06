@@ -49,8 +49,7 @@ struct SignupView: View {
                 .padding(AuthenticationUI.screenPadding)
                 
                 if vm.isCountriesLoading {
-                    ProgressView()
-                        .tint(ColorConstants.primary)
+                    AppProgressView()
                 } else if let countries = vm.countriesList,
                           vm.selectedCountry != nil,
                           !countries.isEmpty {
