@@ -114,9 +114,6 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
         swiftDataHelper.saveData { result in
             print("save status: \(result)")
         }
-        
-        let data: [BookObject]? = swiftDataHelper.fetchData()
-        print("Data stored: \(data?.count)")
     }
     
     private func rearrangeNewBooks(_ newBooks: [BookData]) {

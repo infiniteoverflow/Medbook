@@ -42,8 +42,7 @@ struct CountriesData: Codable {
 
 /// Represents information about an individual country
 //TODO: Do we need id now?
-struct Country: Codable, Hashable, Equatable, Identifiable {
-    let id = UUID()
+struct Country: Codable, Hashable, Equatable {
     /// The name of the country
     let country: String?
     /// The region to which the country belongs

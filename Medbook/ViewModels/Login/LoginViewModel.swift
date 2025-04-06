@@ -106,10 +106,7 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
                 swiftDataHelper.saveData { _ in
                     //Do nothing as of now
                 }
-                
-                let appPObjs: [AppPreferenceObject]? = swiftDataHelper.fetchData()
-                print(appPObjs?.count)
-                
+        
                 completion(.success)
                 return
             }
