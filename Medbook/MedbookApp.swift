@@ -23,7 +23,9 @@ struct MedbookApp: App {
     init() {
         //Start the netfox instance to log network calls for debugging
         #if DEBUG
-        NFX.sharedInstance().start()
+        DispatchQueue.main.async {
+            NFX.sharedInstance().start()
+        }
         #endif
     }
 
