@@ -10,8 +10,21 @@ import SwiftData
 
 struct HomePageView: View {
     @ObservedObject var vm: HomePageViewModel
-    @State private var isAtBottom = false
-    @State private var contentHeight: CGFloat = 0
+    @State var isSearchPresented = true
+    
+    struct Constants {
+        static let titleFontSize: CGFloat = 28
+        static let titlePadding: CGFloat = 16
+        static let sortBookListSectionSpacing: CGFloat = 16
+        static let interSortCategorySpacing: CGFloat = 8
+        static let categoryVerticalSpacing: CGFloat = 8
+        static let categoryHorizontalSpacing: CGFloat = 8
+        static let categoryCornerRadius: CGFloat = 4
+        static let interBookSpacing: CGFloat = 16
+        static let toolBarItemSpacing: CGFloat = 16
+        static let toolBarItemDimension: CGFloat = 30
+        static let toolBarTextFontSize: CGFloat = 24
+    }
     
     init(vm: HomePageViewModel) {
         self.vm = vm
@@ -20,23 +33,24 @@ struct HomePageView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                Text("Which topic interests\nyou today?")
-                    .font(.system(size: 28, weight: .bold))
-                    .padding(16)
+                Text(TextConstants.Home.title)
+                    .font(.system(size: Constants.titleFontSize, weight: .bold))
+                    .padding(Constants.titlePadding)
                     .foregroundStyle(ColorConstants.black)
                 
                 if vm.isBookListingLoading {
                     AppProgressView()
                 } else if !vm.books.isEmpty {
-                    HStack(spacing: 16) {
-                        Text("Sort By:")
+                    HStack(spacing: Constants.sortBookListSectionSpacing) {
+                        Text(TextConstants.Home.sortTitle)
                         
-                        HStack(spacing: 8) {
+                        HStack(spacing: Constants.interSortCategorySpacing) {
                             ForEach(vm.sortCategories, id: \.self) { category in
                                 Text(category.rawValue)
-                                    .padding(8)
+                                    .padding(.vertical, Constants.categoryVerticalSpacing)
+                                    .padding(.horizontal, Constants.categoryHorizontalSpacing)
                                     .background(vm.selectedSortCategory == category ? ColorConstants.primary : ColorConstants.secondary)
-                                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                                    .clipShape(RoundedRectangle(cornerRadius: Constants.categoryCornerRadius))
                                     .onTapGesture {
                                         vm.selectedSortCategory = category
                                         vm.books = vm.sortBasedOnCategory(books: vm.books,
@@ -49,14 +63,16 @@ struct HomePageView: View {
                     .foregroundStyle(ColorConstants.black)
                     .padding()
                     
-                    LazyVStack(spacing: 16) {
+                    LazyVStack(spacing: Constants.interBookSpacing) {
                         ForEach(Array(vm.books.enumerated()), id: \.element.id) { index, book in
-                            BookDetailsCardView(bookData: book) { status in
+                            BookDetailsCardView(bookData: book,
+                                                type: .bookmark,
+                                                onBookmarkedStatusChanged: { status in
                                 vm.bookmarkStatusChanged(for: book, status: status)
-                            }
+                            },
+                                                onDeleteTapped: nil)
                                 .onAppear {
                                     if index == vm.books.count - 1 {
-                                        print("Fetching new books")
                                         vm.isLoadingMoreBooks = true
                                         vm.fetchBooksData()
                                     }
@@ -76,35 +92,36 @@ struct HomePageView: View {
             }
         }
         .background(ColorConstants.secondary)
-        .searchable(text: $vm.searchText)
+        .searchable(text: $vm.searchText, isPresented: $isSearchPresented)
         .searchPresentationToolbarBehavior(.avoidHidingContent)
         .navigationBarBackButtonHidden()
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                HStack(spacing: 16) {
-                    Image(systemName: "book.fill")
+                HStack(spacing: Constants.toolBarItemSpacing) {
+                    Image(systemName: TextConstants.Home.navBarLeadingPrimaryIcon)
                         .resizable()
-                        .frame(width: 30, height: 30)
+                        .frame(width: Constants.toolBarItemDimension, height: Constants.toolBarItemDimension)
                         .bold()
                     
-                    Text("MedBook")
-                        .font(.system(size: 24, weight: .bold))
+                    Text(TextConstants.Home.navBarLeadingSecondaryText)
+                        .font(.system(size: Constants.toolBarTextFontSize,
+                                      weight: .bold))
                 }
                 .foregroundStyle(ColorConstants.black)
             }
             
             ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 16) {
-                    Image(systemName: "bookmark.fill")
+                HStack(spacing: Constants.toolBarItemSpacing) {
+                    Image(systemName: TextConstants.Home.navBarTrailingPrimaryIcon)
                         .resizable()
-                        .frame(width: 30, height: 35)
+                        .frame(width: Constants.toolBarItemDimension, height: Constants.toolBarItemDimension + 5)
                         .onTapGesture {
                             vm.navigationManager.navigateTo(screen: .bookmarks)
                         }
                     
-                    Image(systemName: "delete.left")
+                    Image(systemName: TextConstants.Home.navBarTrailingSecondaryIcon)
                         .resizable()
-                        .frame(width: 30, height: 30)
+                        .frame(width: Constants.toolBarItemDimension, height: Constants.toolBarItemDimension)
                         .foregroundStyle(ColorConstants.red)
                         .onTapGesture {
                             vm.logout()
@@ -112,6 +129,9 @@ struct HomePageView: View {
                 }
                 .foregroundStyle(ColorConstants.black)
             }
+        }
+        .onAppear {
+            isSearchPresented = true // Show the search bar when the view appears
         }
     }
 }

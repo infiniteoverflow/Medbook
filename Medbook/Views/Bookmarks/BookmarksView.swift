@@ -9,16 +9,30 @@ import SwiftUI
 import SwiftData
 
 struct BookmarksView: View {
-    @Environment(\.modelContext) var modelContext
-    @Query var books: [BookObject]
+    @Query(animation: .bouncy) var books: [BookObject]
+    let modelContext: ModelContext
+    let swiftDataHelper: SwiftDataHelper
+    
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
+        self.swiftDataHelper = SwiftDataHelper(modelContext: modelContext)
+    }
     
     var body: some View {
         ScrollView {
             LazyVStack {
                 ForEach(books, id: \.self) { book in
-                    BookDetailsCardView(bookData: BookData(from: book)) { status in
-                        //Do nothing for now
-                    }
+                    BookDetailsCardView(bookData: BookData(from: book),
+                                        type: .delete,
+                                        onBookmarkedStatusChanged: nil,
+                                        onDeleteTapped: {
+                        withAnimation(.easeOut) {
+                            swiftDataHelper.removeData(book)
+                            swiftDataHelper.saveData { result in
+                                print(result)
+                            }
+                        }
+                    })
                 }
             }
         }
@@ -27,8 +41,4 @@ struct BookmarksView: View {
         .navigationTitle("Bookmarks")
         .navigationBarTitleDisplayMode(.large)
     }
-}
-
-#Preview {
-    BookmarksView()
 }

@@ -8,10 +8,27 @@
 import SwiftUI
 import Kingfisher
 
+enum BookDetailsCardTrailingIconType {
+    case delete
+    case bookmark
+}
+
 struct BookDetailsCardView: View {
     let bookData: BookData
+    let type: BookDetailsCardTrailingIconType
     @State private var bookmarked = false
-    var onBookmarkedStatusChanged: (Bool) -> Void
+    var onBookmarkedStatusChanged: ((Bool) -> Void)?
+    var onDeleteTapped: (() -> Void)?
+    
+    init(bookData: BookData,
+         type: BookDetailsCardTrailingIconType,
+         onBookmarkedStatusChanged: ((Bool) -> Void)?,
+         onDeleteTapped: (() -> Void)?) {
+        self.bookData = bookData
+        self.type = type
+        self.onBookmarkedStatusChanged = onBookmarkedStatusChanged
+        self.onDeleteTapped = onDeleteTapped
+    }
     
     var body: some View {
         HStack {
@@ -58,31 +75,7 @@ struct BookDetailsCardView: View {
             
             Spacer()
             
-            if bookmarked {
-                Image(systemName: "bookmark.fill")
-                    .resizable()
-                    .frame(width: 20, height: 30)
-                    .foregroundStyle(ColorConstants.green)
-                    .onTapGesture {
-                        withAnimation(.easeInOut) {
-                            bookmarked.toggle()
-                            onBookmarkedStatusChanged(bookmarked)
-                        }
-                    }
-                    .padding(.leading, 16)
-            } else {
-                Image(systemName: "bookmark")
-                    .resizable()
-                    .frame(width: 20, height: 30)
-                    .foregroundStyle(ColorConstants.black)
-                    .onTapGesture {
-                        withAnimation(.easeInOut) {
-                            bookmarked.toggle()
-                            onBookmarkedStatusChanged(bookmarked)
-                        }
-                    }
-                    .padding(.leading, 16)
-            }
+            AnyView(getTrailingView(for: type))
             
         }
         .frame(maxWidth: .infinity)
@@ -90,14 +83,67 @@ struct BookDetailsCardView: View {
         .background(ColorConstants.white)
         .clipShape(RoundedRectangle(cornerRadius: 12))
     }
+    
+    private func getTrailingView(for type: BookDetailsCardTrailingIconType) -> any View {
+        switch type {
+        case .delete:
+            return BookDetailsTrailingIconView(icon: "xmark.bin.fill",
+                                               color: ColorConstants.red,
+                                               height: 20,
+                                               width: 20) {
+                withAnimation {
+                    onDeleteTapped?()
+                }
+            }
+        case .bookmark:
+            if bookmarked {
+                return BookDetailsTrailingIconView(icon: "bookmark.fill", color: ColorConstants.green) {
+                    withAnimation(.easeInOut) {
+                        bookmarked.toggle()
+                        onBookmarkedStatusChanged?(bookmarked)
+                    }
+                }
+            } else {
+                return BookDetailsTrailingIconView(icon: "bookmark", color: ColorConstants.black) {
+                        withAnimation(.easeInOut) {
+                            bookmarked.toggle()
+                            onBookmarkedStatusChanged?(bookmarked)
+                        }
+                    }
+            }
+        }
+    }
 }
 
-#Preview {
-    BookDetailsCardView(bookData: BookData(authorName: ["Aswin Gopinathan"],
-                                           coverI: 9269962,
-                                           title: "Living my life!",
-                                           firstPublishYear: 2032)) { status in
-        print(status)
+struct BookDetailsTrailingIconView: View {
+    let icon: String
+    let color: Color
+    let height: CGFloat
+    let width: CGFloat
+    let onTap: () -> Void
+    
+    init(icon: String,
+         color: Color,
+         height: CGFloat = 30,
+         width: CGFloat = 20,
+         onTap: @escaping () -> Void) {
+        self.icon = icon
+        self.color = color
+        self.height = height
+        self.width = width
+        self.onTap = onTap
+    }
+    
+    var body: some View {
+        Image(systemName: icon)
+                .resizable()
+                .frame(width: width, height: height)
+                .foregroundStyle(color)
+                .onTapGesture {
+                    onTap()
+                }
+                .padding(.leading, 16)
+                .bold()
     }
 }
 

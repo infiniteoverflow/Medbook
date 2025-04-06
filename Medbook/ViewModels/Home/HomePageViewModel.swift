@@ -125,6 +125,12 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
         
         // Insert each book with animation
         for (_ , newBook) in newBooks.enumerated() {
+            //Check for duplicate books, if it exists, skip this book
+            if let bookExist = books.first(where: { data in
+                newBook.title == data.title
+            }) {
+                continue
+            }
             // Find the correct insertion index
             let insertIndex = books.firstIndex(where: {
                 switch selectedSortCategory {

@@ -95,7 +95,7 @@ struct MedbookApp: App {
             HomePageView(vm: HomePageViewModel(navigationManager: navigationManager,
                                                modelContext: container.mainContext))
         case .bookmarks:
-            BookmarksView()
+            BookmarksView(modelContext: container.mainContext)
         case .landing:
             LandingView()
         }
