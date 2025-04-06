@@ -13,7 +13,9 @@ extension UIWindow {
     open override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
         if motion == .motionShake {
             //Show the netfox network debugger window
+            #if DEBUG
             NFX.sharedInstance().show()
+            #endif
         }
     }
 }

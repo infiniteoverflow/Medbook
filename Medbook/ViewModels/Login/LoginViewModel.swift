@@ -100,9 +100,25 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
                 obj.encodedCredential == base64EncodedData
             }
             
-            return user == nil ? completion(.failure(reason: "No User")) : completion(.success)
+            if user != nil {
+                let appPreferenceObject = AppPreferenceObject(encodedCredential: base64EncodedData)
+                swiftDataHelper.storeData(appPreferenceObject)
+                swiftDataHelper.saveData { _ in
+                    //Do nothing as of now
+                }
+                
+                let appPObjs: [AppPreferenceObject]? = swiftDataHelper.fetchData()
+                print(appPObjs?.count)
+                
+                completion(.success)
+                return
+            }
+            
+            completion(.failure(reason: "No User"))
+            return
         }
         
-        return completion(.failure(reason: "No User"))
+        completion(.failure(reason: "No User"))
+        return
     }
 }

@@ -24,6 +24,8 @@ struct BookmarksView: View {
         }
         .padding(24)
         .background(ColorConstants.secondary)
+        .navigationTitle("Bookmarks")
+        .navigationBarTitleDisplayMode(.large)
     }
 }
 

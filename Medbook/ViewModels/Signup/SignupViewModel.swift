@@ -56,7 +56,17 @@ final class SignupViewModel: ObservableObject {
         if let base64EncodedData = AppUtils.generateBase64String(email: emailText, password: passwordText) {
             let userObject = UserObject(encodedCredential: base64EncodedData)
             swiftDataHelper.storeData(userObject)
-            swiftDataHelper.saveData(completion: completion)
+            swiftDataHelper.saveData { status in
+                switch status {
+                case .success:
+                    let appPreferenceObject = AppPreferenceObject(encodedCredential: base64EncodedData)
+                    swiftDataHelper.storeData(appPreferenceObject)
+                    swiftDataHelper.saveData(completion: completion)
+                case .failure:
+                    //Todo: Handle separately
+                    completion(status)
+                }
+            }
         }
     }
     

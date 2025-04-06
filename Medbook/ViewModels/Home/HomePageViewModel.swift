@@ -42,7 +42,18 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
     }
     
     func logout() {
+        clearAppPreferenceData()
         navigationManager.navigateToClearingAll(screen: .landing)
+    }
+    
+    private func clearAppPreferenceData() {
+        let appPreferenceObjects: [AppPreferenceObject]? = swiftDataHelper.fetchData()
+        appPreferenceObjects?.forEach({ obj in
+            swiftDataHelper.removeData(obj)
+        })
+        swiftDataHelper.saveData { result in
+            print(result)
+        }
     }
     
     func fetchBooksData() {
