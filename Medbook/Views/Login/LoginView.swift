@@ -54,6 +54,12 @@ struct LoginView: View {
         }
         .padding(AuthenticationUI.screenPadding)
         .background(ColorConstants.white)
+        .alert("No user found, go to Sign up!", isPresented: $vm.showingAlert) {
+            Button("Cancel", role: .cancel) {}
+            Button("Sign up", role: .none) {
+                vm.navigationManager.navigateToClearingAll(screen: .signup)
+            }
+        }
     }
 }
 

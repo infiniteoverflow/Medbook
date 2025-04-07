@@ -17,6 +17,7 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
     @Published var passwordText: String = ""
     @Published var invalidEmailErrorText: String?
     @Published var loginEnabled = false
+    @Published var showingAlert = false
     
     private var isEmailValid = false
     
@@ -86,7 +87,7 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
             case .success:
                 navigationManager.navigateTo(screen: .home)
             case .failure(let reason):
-                print("Failure: \(reason)")
+                showingAlert = true
             }
         }
     }
@@ -108,14 +109,11 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
                 }
         
                 completion(.success)
-                return
+            } else {
+                completion(.failure(reason: "No User"))
             }
-            
+        } else {
             completion(.failure(reason: "No User"))
-            return
         }
-        
-        completion(.failure(reason: "No User"))
-        return
     }
 }

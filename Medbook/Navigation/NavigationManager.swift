@@ -23,6 +23,8 @@ final class NavigationManager: ObservableObject, NavigationManagerProtocol {
             navigationPath.append(screen)
         } else {
             navigationPath = NavigationPath()
+            navigationPath.append(screen)
+
         }
     }
 }
