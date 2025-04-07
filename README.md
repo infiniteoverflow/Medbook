@@ -17,12 +17,12 @@ Home Screen               |  Bookmarks Screen              | Home Screen with Se
 :-------------------------:|:-------------------------:|:-------------------------:|:-------------------------:
 ![](https://github.com/infiniteoverflow/Medbook/blob/main/Screenshots/IMG_0445.PNG?raw=true)|![](https://github.com/infiniteoverflow/Medbook/blob/main/Screenshots/IMG_0446.PNG?raw=true)|![](https://github.com/infiniteoverflow/Medbook/blob/main/Screenshots/IMG_0447.PNG?raw=true)|![](https://github.com/infiniteoverflow/Medbook/blob/main/Screenshots/IMG_0448.PNG?raw=true)|
 
-# High level flow diagram
-![](https://github.com/infiniteoverflow/Medbook/blob/main/Screenshots/IMG_0299.jpg?raw=true)
-
 # Surprise!
 Shake the device while you are running the app to see the network logs.
 Integrated netfox network debugger into the app.
+
+# High level flow diagram
+![](https://github.com/infiniteoverflow/Medbook/blob/main/Screenshots/IMG_0299.jpg?raw=true)
 
 # Next steps
 1. Dark Mode support
