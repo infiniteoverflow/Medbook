@@ -112,12 +112,14 @@ struct HomePageView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: Constants.toolBarItemSpacing) {
-                    Image(systemName: TextConstants.Home.navBarTrailingPrimaryIcon)
-                        .resizable()
-                        .frame(width: Constants.toolBarItemDimension, height: Constants.toolBarItemDimension + 5)
-                        .onTapGesture {
-                            vm.navigationManager.navigateTo(screen: .bookmarks)
-                        }
+                    NavigationLink {
+                        BookmarksView(modelContext: vm.modelContext)
+                    } label: {
+                        Image(systemName: TextConstants.Home.navBarTrailingPrimaryIcon)
+                            .resizable()
+                            .frame(width: Constants.toolBarItemDimension, height: Constants.toolBarItemDimension + 5)
+                    }
+                        
                     
                     Image(systemName: TextConstants.Home.navBarTrailingSecondaryIcon)
                         .resizable()
