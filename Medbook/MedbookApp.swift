@@ -20,6 +20,9 @@ struct MedbookApp: App {
     //ViewModel for the current view which ideally takes care of the initial navigation
     @State var vm: AppViewModel?
     
+    //Maintain the App state
+    @StateObject private var appState = AppState()
+    
     init() {
         //Start the netfox instance to log network calls for debugging
         #if DEBUG
@@ -64,6 +67,7 @@ struct MedbookApp: App {
             }
         }
         .environmentObject(navigationManager) //We need a common instance of NavigationManager throughout the App Session
+        .environmentObject(appState) //Maintain the state of the app
         .modelContainer(for: [CountryObject.self, //Represents the Country object
                               UserObject.self, //Represents the details of the user after authentication
                               BookObject.self, //Represents each book item
@@ -79,6 +83,7 @@ struct MedbookApp: App {
         case .success(let container):
             self.container = container
             vm = AppViewModel(modelContext: container.mainContext)
+            appState.user = vm?.currentUser
         case .failure(let error):
             print("MedbookApp - Error creating container: \(error)")
         }

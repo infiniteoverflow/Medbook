@@ -9,7 +9,8 @@ import SwiftUI
 import SwiftData
 
 struct BookmarksView: View {
-    @Query(animation: .bouncy) var books: [BookObject]
+    @EnvironmentObject var appState: AppState
+    
     let modelContext: ModelContext
     let swiftDataHelper: SwiftDataHelper
     
@@ -21,12 +22,15 @@ struct BookmarksView: View {
     var body: some View {
         ScrollView {
             LazyVStack {
-                ForEach(books, id: \.self) { book in
+                ForEach(appState.user?.bookmarks ?? [], id: \.self) { book in
                     BookDetailsCardView(bookData: BookData(from: book),
                                         type: .delete,
                                         onBookmarkedStatusChanged: nil,
                                         onDeleteTapped: {
                         withAnimation(.easeOut) {
+                            appState.user?.bookmarks.removeAll(where: { obj in
+                                obj.identifier == book.identifier
+                            })
                             swiftDataHelper.removeData(book)
                             swiftDataHelper.saveData { result in
                                 print(result)

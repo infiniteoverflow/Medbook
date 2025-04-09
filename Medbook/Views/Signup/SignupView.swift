@@ -10,6 +10,7 @@ import SwiftUI
 struct SignupView: View {
     @ObservedObject var vm: SignupViewModel
     @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var appState: AppState
     
     struct Constants {
         static let title = "Welcome"
@@ -72,12 +73,9 @@ struct SignupView: View {
                        icon: "arrow.forward",
                        enabled: $vm.signupButtonEnabled) {
                 vm.onSubmitTapped { result in
-                    switch result {
-                    case .success:
+                    if let userObj = result {
+                        appState.user = userObj
                         navigationManager.navigateTo(screen: .home)
-                    case .failure:
-                        //TODO: Handle failure to save data in DB
-                        print("Saving data failed")
                     }
                 }
             }

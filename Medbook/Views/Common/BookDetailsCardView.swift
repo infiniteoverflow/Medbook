@@ -14,7 +14,7 @@ enum BookDetailsCardTrailingIconType {
 }
 
 struct BookDetailsCardView: View {
-    let bookData: BookData
+    var bookData: BookData
     let type: BookDetailsCardTrailingIconType
     @State private var bookmarked = false
     var onBookmarkedStatusChanged: ((Bool) -> Void)?
@@ -96,7 +96,7 @@ struct BookDetailsCardView: View {
                 }
             }
         case .bookmark:
-            if bookmarked {
+            if bookData.isBookmarked == true || bookmarked {
                 return BookDetailsTrailingIconView(icon: "bookmark.fill", color: ColorConstants.green) {
                     withAnimation(.easeInOut) {
                         bookmarked.toggle()

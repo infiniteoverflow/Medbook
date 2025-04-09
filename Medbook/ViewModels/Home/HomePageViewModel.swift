@@ -27,6 +27,7 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
     @Published var isLoadingMoreBooks = false
     @Published var searchText: String = ""
     @Published var selectedSortCategory: SortCategories = .title
+    var bookmarkedBooks: [String: BookObject] = [:]
 
     private var cancellables = Set<AnyCancellable>()
     private var swiftDataHelper: SwiftDataHelper
@@ -45,17 +46,7 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
         clearAppPreferenceData()
         navigationManager.navigateToClearingAll(screen: .landing)
     }
-    
-    private func clearAppPreferenceData() {
-        let appPreferenceObjects: [AppPreferenceObject]? = swiftDataHelper.fetchData()
-        appPreferenceObjects?.forEach({ obj in
-            swiftDataHelper.removeData(obj)
-        })
-        swiftDataHelper.saveData { result in
-            print(result)
-        }
-    }
-    
+        
     func fetchBooksData() {
         AGNetworkClient.shared.makeRequest(urlString: UrlConstants.bookListing(title: searchText,
                                                                                limit: limit,
@@ -87,7 +78,7 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
     }
     
     func sortBasedOnCategory(books: [BookData], category: SortCategories) -> [BookData] {
-        let sortedBooks = books.sorted { book1, book2 in
+        var sortedBooks = books.sorted { book1, book2 in
             switch selectedSortCategory {
             case .title:
                 book1.title ?? "" < book2.title ?? ""
@@ -98,21 +89,79 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
             }
         }
         
+        sortedBooks = sortedBooks.map { book in
+            if let _ = bookmarkedBooks[book.lendingIdentifier ?? ""] {
+                return BookData(authorName: book.authorName,
+                                coverI: book.coverI,
+                                title: book.title,
+                                firstPublishYear: book.firstPublishYear,
+                                lendingIdentifier: book.lendingIdentifier,
+                                isBookmarked: true)
+            }
+            
+            return book
+        }
+        
         return sortedBooks
     }
     
-    func bookmarkStatusChanged(for book: BookData, status: Bool) {
+    func bookmarkStatusChanged(for book: BookData, status: Bool, user: UserObject?) {
         let bookObject = BookObject(from: book)
-        
+        bookObject.isBookmarked = status
         switch status {
         case true:
-            swiftDataHelper.storeData(bookObject)
+            user?.bookmarks.append(bookObject)
+            bookmarkedBooks[bookObject.identifier] = bookObject
         case false:
-            swiftDataHelper.removeData(bookObject)
+            user?.bookmarks.removeAll(where: { obj in
+                obj.identifier == bookObject.identifier
+            })
+            bookmarkedBooks[bookObject.identifier] = nil
+        }
+        
+        if let user {
+            swiftDataHelper.storeData(user)
         }
         
         swiftDataHelper.saveData { result in
-            print("save status: \(result)")
+            switch result {
+            case .success:
+                print("Success!")
+            case .failure:
+                print("Failed")
+            }
+        }
+    }
+    
+    func fetchBookmarks(for user: UserObject?) {
+        bookmarkedBooks = [:]
+        user?.bookmarks.forEach { obj in
+            bookmarkedBooks[obj.identifier] = obj
+        }
+    }
+    
+    func recheckBookmarksStatus() {
+        books = books.map { book in
+            if let _ = bookmarkedBooks[book.lendingIdentifier ?? ""] {
+                return book
+            }
+            
+            return BookData(authorName: book.authorName,
+                            coverI: book.coverI,
+                            title: book.title,
+                            firstPublishYear: book.firstPublishYear,
+                            lendingIdentifier: book.lendingIdentifier,
+                            isBookmarked: false)
+        }
+    }
+    
+    private func clearAppPreferenceData() {
+        let appPreferenceObjects: [AppPreferenceObject]? = swiftDataHelper.fetchData()
+        appPreferenceObjects?.forEach({ obj in
+            swiftDataHelper.removeData(obj)
+        })
+        swiftDataHelper.saveData { result in
+            print(result)
         }
     }
     

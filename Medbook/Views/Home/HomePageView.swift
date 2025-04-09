@@ -11,6 +11,7 @@ import SwiftData
 struct HomePageView: View {
     @ObservedObject var vm: HomePageViewModel
     @State var isSearchPresented = true
+    @EnvironmentObject var appState: AppState
     
     struct Constants {
         static let titleFontSize: CGFloat = 28
@@ -68,7 +69,9 @@ struct HomePageView: View {
                             BookDetailsCardView(bookData: book,
                                                 type: .bookmark,
                                                 onBookmarkedStatusChanged: { status in
-                                vm.bookmarkStatusChanged(for: book, status: status)
+                                vm.bookmarkStatusChanged(for: book,
+                                                         status: status,
+                                                         user: appState.user)
                             },
                                                 onDeleteTapped: nil)
                                 .onAppear {
@@ -134,6 +137,8 @@ struct HomePageView: View {
         }
         .onAppear {
             isSearchPresented = true // Show the search bar when the view appears
+            vm.fetchBookmarks(for: appState.user)
+            vm.recheckBookmarksStatus()
         }
     }
 }

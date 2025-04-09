@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LoginView: View {
     @ObservedObject var vm: LoginViewModel
+    @EnvironmentObject var appState: AppState
     
     struct Constants {
         static let title = "Welcome,"
@@ -47,7 +48,9 @@ struct LoginView: View {
                 ButtonView(text: Constants.ctaTitle,
                            icon: ImageConstants.authenticationCTAIcon,
                            enabled: $vm.loginEnabled) {
-                    vm.onLoginTapped()
+                    vm.onLoginTapped { user in
+                        appState.user = user
+                    }
                 }
                 Spacer()
             }

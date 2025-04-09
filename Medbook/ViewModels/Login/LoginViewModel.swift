@@ -80,21 +80,19 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
             .store(in: &cancellables)
     }
     
-    func onLoginTapped() {
+    func onLoginTapped(completion: (UserObject) -> Void) {
         validateCredentials(email: emailText,
-                            password: passwordText) { state in
-            switch state {
-            case .success:
+                            password: passwordText) { user in
+            if let user {
+                completion(user)
                 navigationManager.navigateTo(screen: .home)
-            case .failure(let reason):
-                showingAlert = true
             }
         }
     }
     
     func validateCredentials(email: String,
                              password: String,
-                             completion: (AuthenticationState) -> Void) {
+                             completion: (UserObject?) -> Void) {
         let userObjects: [UserObject] = swiftDataHelper.fetchData() ?? []
         if let base64EncodedData = AppUtils.generateBase64String(email: emailText, password: passwordText) {
             let user = userObjects.first { obj in
@@ -108,12 +106,12 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
                     //Do nothing as of now
                 }
         
-                completion(.success)
+                completion(user)
             } else {
-                completion(.failure(reason: "No User"))
+                completion(nil)
             }
         } else {
-            completion(.failure(reason: "No User"))
+            completion(nil)
         }
     }
 }

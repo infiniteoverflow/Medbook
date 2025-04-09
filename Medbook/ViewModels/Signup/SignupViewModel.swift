@@ -52,7 +52,7 @@ final class SignupViewModel: ObservableObject {
         handleApiResponses()
     }
     
-    func onSubmitTapped(completion: (DataSaveResult) -> Void) {
+    func onSubmitTapped(completion: (UserObject?) -> Void) {
         if let base64EncodedData = AppUtils.generateBase64String(email: emailText, password: passwordText) {
             let userObject = UserObject(encodedCredential: base64EncodedData)
             swiftDataHelper.storeData(userObject)
@@ -61,10 +61,11 @@ final class SignupViewModel: ObservableObject {
                 case .success:
                     let appPreferenceObject = AppPreferenceObject(encodedCredential: base64EncodedData)
                     swiftDataHelper.storeData(appPreferenceObject)
-                    swiftDataHelper.saveData(completion: completion)
+                    swiftDataHelper.saveData { _ in }
+                    completion(userObject)
                 case .failure:
                     //Todo: Handle separately
-                    completion(status)
+                    completion(nil)
                 }
             }
         }

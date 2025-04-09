@@ -12,7 +12,12 @@ final class UserObject {
     @Attribute(.unique)
     var encodedCredential: String
     
-    init(encodedCredential: String) {
+    @Relationship(deleteRule: .cascade)
+    var bookmarks: [BookObject] = []
+    
+    init(encodedCredential: String,
+         bookmarks: [BookObject] = []) {
         self.encodedCredential = encodedCredential
+        self.bookmarks = bookmarks
     }
 }
