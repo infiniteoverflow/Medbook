@@ -10,13 +10,10 @@ import SwiftData
 
 struct BookmarksView: View {
     @EnvironmentObject var appState: AppState
+    let vm: BookmarksViewModel
     
-    let modelContext: ModelContext
-    let swiftDataHelper: SwiftDataHelper
-    
-    init(modelContext: ModelContext) {
-        self.modelContext = modelContext
-        self.swiftDataHelper = SwiftDataHelper(modelContext: modelContext)
+    init(vm: BookmarksViewModel) {
+        self.vm = vm
     }
     
     var body: some View {
@@ -28,13 +25,8 @@ struct BookmarksView: View {
                                         onBookmarkedStatusChanged: nil,
                                         onDeleteTapped: {
                         withAnimation(.easeOut) {
-                            appState.user?.bookmarks.removeAll(where: { obj in
-                                obj.identifier == book.identifier
-                            })
-                            swiftDataHelper.removeData(book)
-                            swiftDataHelper.saveData { result in
-                                print(result)
-                            }
+                            vm.onDeleteTapped(appState: appState,
+                                              book: book)
                         }
                     })
                 }

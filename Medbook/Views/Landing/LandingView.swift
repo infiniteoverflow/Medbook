@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct LandingView: View {
-    @EnvironmentObject private var navigationManager: NavigationManager
+    @ObservedObject var vm: LandingViewModel
+    
+    init(vm: LandingViewModel) {
+        self.vm = vm
+    }
     
     struct Constants {
         //Height of the Landing Page Image
@@ -34,12 +38,12 @@ struct LandingView: View {
                 ButtonView(text: TextConstants.Landing.signupText,
                            icon: nil,
                            enabled: .constant(true)) {
-                    navigationManager.navigateTo(screen: .signup)
+                    vm.navigateToSignUp()
                 }
                 ButtonView(text: TextConstants.Landing.loginText,
                            icon: nil,
                            enabled: .constant(true)) {
-                    navigationManager.navigateTo(screen: .login)
+                    vm.navigateToLogin()
                 }
             }
             .padding(.bottom, Constants.buttonsBottomPadding)
@@ -49,14 +53,5 @@ struct LandingView: View {
         .navigationBarBackButtonHidden()
         .background(ColorConstants.primary)
     }
-}
-
-#Preview {
-    @Previewable @StateObject var navigationManager = NavigationManager()
-    
-    NavigationView {
-        LandingView()
-    }
-    .environmentObject(navigationManager)
 }
 

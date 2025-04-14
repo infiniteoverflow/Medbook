@@ -115,14 +115,12 @@ struct HomePageView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: Constants.toolBarItemSpacing) {
-                    NavigationLink {
-                        BookmarksView(modelContext: vm.modelContext)
-                    } label: {
-                        Image(systemName: TextConstants.Home.navBarTrailingPrimaryIcon)
-                            .resizable()
-                            .frame(width: Constants.toolBarItemDimension, height: Constants.toolBarItemDimension + 5)
-                    }
-                        
+                    Image(systemName: TextConstants.Home.navBarTrailingPrimaryIcon)
+                        .resizable()
+                        .frame(width: Constants.toolBarItemDimension, height: Constants.toolBarItemDimension + 5)
+                        .onTapGesture {
+                            vm.navigateToBookmarks()
+                        }
                     
                     Image(systemName: TextConstants.Home.navBarTrailingSecondaryIcon)
                         .resizable()
@@ -141,28 +139,4 @@ struct HomePageView: View {
             vm.recheckBookmarksStatus()
         }
     }
-}
-
-#Preview {
-    @Previewable @Environment(\.modelContext) var modelContext
-    @Previewable @State var container: ModelContainer?
-    
-    NavigationView {
-        if let container {
-            HomePageView(vm: HomePageViewModel(navigationManager: NavigationManager(),
-                                               modelContext: container.mainContext))
-        } else {
-            AppProgressView()
-        }
-    }
-    .modelContainer(for: [CountryObject.self,
-                          UserObject.self])  { result in
-        switch result {
-        case .success(let previewContainer):
-            container = previewContainer
-        case .failure(let error):
-            print("MedbookApp - Error creating container: \(error)")
-        }
-    }
-    
 }

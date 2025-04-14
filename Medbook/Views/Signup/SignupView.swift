@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SignupView: View {
     @ObservedObject var vm: SignupViewModel
-    @EnvironmentObject var navigationManager: NavigationManager
     @EnvironmentObject var appState: AppState
     
     struct Constants {
@@ -72,19 +71,9 @@ struct SignupView: View {
             ButtonView(text: "Let's go",
                        icon: "arrow.forward",
                        enabled: $vm.signupButtonEnabled) {
-                vm.onSubmitTapped { result in
-                    if let userObj = result {
-                        appState.user = userObj
-                        navigationManager.navigateTo(screen: .home)
-                    }
-                }
+                vm.onSubmitTapped(appState: appState)
             }
         }
         .background(ColorConstants.white)
     }
-}
-
-#Preview {
-    @Previewable @Environment(\.modelContext) var modelContext
-    SignupView(vm: SignupViewModel(modelContext: modelContext))
 }

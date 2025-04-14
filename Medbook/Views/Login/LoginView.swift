@@ -48,9 +48,7 @@ struct LoginView: View {
                 ButtonView(text: Constants.ctaTitle,
                            icon: ImageConstants.authenticationCTAIcon,
                            enabled: $vm.loginEnabled) {
-                    vm.onLoginTapped { user in
-                        appState.user = user
-                    }
+                    vm.onLoginTapped(appState: appState)
                 }
                 Spacer()
             }
@@ -60,15 +58,8 @@ struct LoginView: View {
         .alert("No user found, go to Sign up!", isPresented: $vm.showingAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Sign up", role: .none) {
-                vm.navigationManager.navigateToClearingAll(screen: .signup)
+                vm.navigateToSignUp()
             }
         }
     }
-}
-
-#Preview {
-    @Previewable @StateObject var navigationManager = NavigationManager()
-    @Previewable @Environment(\.modelContext) var modelContext
-    LoginView(vm: LoginViewModel(navigationManager: navigationManager,
-                                 modelContext: modelContext))
 }

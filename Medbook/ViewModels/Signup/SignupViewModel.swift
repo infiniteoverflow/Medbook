@@ -38,9 +38,12 @@ final class SignupViewModel: ObservableObject {
     let swiftDataHelper: SwiftDataHelper
     
     let modelContext: ModelContext
+    let router: SignupRouter
     
-    init(modelContext: ModelContext) {
+    init(modelContext: ModelContext,
+         router: SignupRouter) {
         self.modelContext = modelContext
+        self.router = router
         self.swiftDataHelper = SwiftDataHelper(modelContext: modelContext)
         
         fetchCountries()
@@ -52,7 +55,7 @@ final class SignupViewModel: ObservableObject {
         handleApiResponses()
     }
     
-    func onSubmitTapped(completion: (UserObject?) -> Void) {
+    func onSubmitTapped(appState: AppState) {
         if let base64EncodedData = AppUtils.generateBase64String(email: emailText, password: passwordText) {
             let userObject = UserObject(encodedCredential: base64EncodedData)
             swiftDataHelper.storeData(userObject)
@@ -62,10 +65,11 @@ final class SignupViewModel: ObservableObject {
                     let appPreferenceObject = AppPreferenceObject(encodedCredential: base64EncodedData)
                     swiftDataHelper.storeData(appPreferenceObject)
                     swiftDataHelper.saveData { _ in }
-                    completion(userObject)
+                    appState.user = userObject
+                    router.navigateToHome()
                 case .failure:
                     //Todo: Handle separately
-                    completion(nil)
+                    break
                 }
             }
         }

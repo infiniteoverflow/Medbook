@@ -12,5 +12,5 @@ enum AuthenticationState {
 
 protocol LoginViewModelProtocol {
     func validateCredentials(email: String, password: String, completion: (UserObject?) -> Void)
-    func onLoginTapped(completion: (UserObject) -> Void)
+    func onLoginTapped(appState: AppState)
 }

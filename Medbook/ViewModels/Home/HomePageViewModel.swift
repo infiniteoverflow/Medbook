@@ -17,8 +17,9 @@ enum SortCategories: String {
 }
 
 final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
-    let navigationManager: NavigationManager
     let modelContext: ModelContext
+    let router: HomePageRouter
+    
     var offset = 0
     var limit = 10
     
@@ -33,10 +34,10 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
     private var swiftDataHelper: SwiftDataHelper
     let sortCategories: [SortCategories] = [.title, .author, .yearOfPublish]
     
-    init(navigationManager: NavigationManager,
-         modelContext: ModelContext) {
-        self.navigationManager = navigationManager
+    init(modelContext: ModelContext,
+         router: HomePageRouter) {
         self.modelContext = modelContext
+        self.router = router
         self.swiftDataHelper = SwiftDataHelper(modelContext: modelContext)
         
         listenToSearchText()
@@ -44,7 +45,7 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
     
     func logout() {
         clearAppPreferenceData()
-        navigationManager.navigateToClearingAll(screen: .landing)
+        //TODO: Perform Logout
     }
         
     func fetchBooksData() {
@@ -153,6 +154,10 @@ final class HomePageViewModel: ObservableObject, HomePageViewModelProtocol {
                             lendingIdentifier: book.lendingIdentifier,
                             isBookmarked: false)
         }
+    }
+    
+    func navigateToBookmarks() {
+        router.navigateToBookmarks()
     }
     
     private func clearAppPreferenceData() {

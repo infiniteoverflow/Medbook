@@ -10,7 +10,6 @@ import SwiftData
 import Combine
 
 final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
-    let navigationManager: NavigationManager
     private var cancellables = Set<AnyCancellable>()
     
     @Published var emailText: String = ""
@@ -22,13 +21,14 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
     private var isEmailValid = false
     
     let modelContext: ModelContext
+    let router: LoginViewRouter
     let swiftDataHelper: SwiftDataHelper
     let base64Helper = Base64Helper()
 
-    init(navigationManager: NavigationManager,
+    init(router: LoginViewRouter,
          modelContext: ModelContext) {
-        self.navigationManager = navigationManager
         self.modelContext = modelContext
+        self.router = router
         self.swiftDataHelper = SwiftDataHelper(modelContext: modelContext)
         
         listenToEmailChange()
@@ -80,14 +80,18 @@ final class LoginViewModel: LoginViewModelProtocol, ObservableObject {
             .store(in: &cancellables)
     }
     
-    func onLoginTapped(completion: (UserObject) -> Void) {
+    func onLoginTapped(appState: AppState) {
         validateCredentials(email: emailText,
                             password: passwordText) { user in
             if let user {
-                completion(user)
-                navigationManager.navigateTo(screen: .home)
+                appState.user = user
+                router.navigateToHome()
             }
         }
+    }
+    
+    func navigateToSignUp() {
+        router.navigateToSignUp()
     }
     
     func validateCredentials(email: String,

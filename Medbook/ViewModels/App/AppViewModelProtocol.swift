@@ -6,5 +6,5 @@
 //
 
 protocol AppViewModelProtocol {
-    func isUserLoggedIn()
+    func isUserLoggedIn() -> Bool
 }
